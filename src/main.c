@@ -2,6 +2,8 @@
 #include <time.h>
 #include <ncurses.h>
 #include "figlet/figlet.h"
+#include "animation/random.h"
+#include "animation/top-down.h"
 #include "macros/array.h"
 
 struct textline {
@@ -55,6 +57,8 @@ int main() {
     },
   };
 
+  void (*animator_func)(int *, int*, int, int) = top_down_animation;
+
   srand(time(NULL));
 
   init_ncurses();
@@ -79,10 +83,11 @@ int main() {
   }
 
   // randomly draw bytes in buffer to correct position
+  x = -1; y = -1;
   while(1) {
     ch = getch();
-    x = (rand() / (float)RAND_MAX) * size_x;
-    y = (rand() / (float)RAND_MAX) * size_y;
+    animator_func(&y, &x, size_y, size_x);
+
     char c = buffer[y][x];
     c = c == 0 ? ' ' : c;
     mvprintw(y, x, "%c", c);
