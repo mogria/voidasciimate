@@ -3,11 +3,7 @@
 #include <ncurses.h>
 #include "figlet/figlet.h"
 
-int main() {
-  int size_x, size_y;
-  int x, y;
-  int ch;
-  char **text;
+void init_ncurses() {
   initscr();
   cbreak();
   noecho();
@@ -15,12 +11,23 @@ int main() {
   intrflush(stdscr, FALSE);
   keypad(stdscr, TRUE);
   nodelay(stdscr, TRUE); 
+}
+
+int main() {
+  int size_x, size_y;
+  int x, y;
+  int ch;
+  char **buffer;
+
 
   srand(time(NULL));
 
+  init_ncurses();
+
   getmaxyx(stdscr, size_y, size_x);
 
-  text = get_figlet_text(size_y, size_x, "\n\nWelcome\nto the\nVOID");
+  ALLOC2(char, buffer, size_y, size_x);
+  get_figlet_text(buffer, size_y, size_x, "VOID", "doh");
 
  
   for(y = 0; y < size_y; y++) {
