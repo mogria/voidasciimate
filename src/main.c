@@ -2,6 +2,8 @@
 #include <time.h>
 #include <ncurses.h>
 #include "figlet/figlet.h"
+#include "macros/array.h"
+
 
 void init_ncurses() {
   initscr();
@@ -39,7 +41,7 @@ int main() {
     ch = getch();
     x = (rand() / (float)RAND_MAX) * size_x;
     y = (rand() / (float)RAND_MAX) * size_y;
-    char c = text[y][x];
+    char c = buffer[y][x];
     c = c == 0 ? ' ' : c;
     mvprintw(y, x, "%c", c);
 
