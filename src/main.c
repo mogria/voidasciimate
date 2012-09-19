@@ -4,6 +4,14 @@
 #include "figlet/figlet.h"
 #include "macros/array.h"
 
+struct textline {
+  char *text;
+  char *fontname;
+  int offset_y;
+  int offset_x;
+  int size_y;
+};
+
 
 void init_ncurses() {
   initscr();
@@ -15,12 +23,37 @@ void init_ncurses() {
   nodelay(stdscr, TRUE); 
 }
 
+#define NUM_TEXTLINES 3
+
 int main() {
   int size_x, size_y;
   int x, y;
   int ch;
   char **buffer;
   char **part;
+  struct textline texts[NUM_TEXTLINES] = {
+    {
+      "welcome",
+      "doh",
+      0,
+      0,
+      20
+    },
+    {
+      "to the",
+      "starwars",
+      20,
+      0,
+      10
+    },
+    {
+      "VOID",
+      "doh",
+      30,
+      0,
+      20
+    },
+  };
 
   srand(time(NULL));
 
@@ -31,23 +64,13 @@ int main() {
   // allocate place for the buffer
   ALLOC2(char, buffer, size_y, size_x);
 
+  for(x = 0; x < NUM_TEXTLINES; x++) {
+    // welcome part
+    PART2(char, part, texts[x].size_y, buffer, texts[x].offset_y, 0);
+    get_figlet_text(part, texts[x].size_y, size_x, texts[x].text, texts[x].fontname);
+    FREE1(part);
+  }
 
-  // welcome part
-  PART2(char, part, 20, buffer, 0, 0);
-  get_figlet_text(part, 20, size_x, "welcome", "doh");
-  FREE1(part);
-
-  // to the part
-  PART2(char, part, 10, buffer, 22, 0);
-  get_figlet_text(part, 10, size_x, "to the", "starwars");
-  FREE1(part);
-
-  // void part
-  PART2(char, part, 20, buffer, 30, 0);
-  get_figlet_text(part, 20, size_x, "VOID", "doh");
-  FREE1(part);
-
- 
   // fill screen with # characters
   for(y = 0; y < size_y; y++) {
     for(x = 0; x < size_x; x++) {
