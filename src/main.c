@@ -30,7 +30,7 @@ void init_ncurses() {
 int main() {
   int size_x, size_y;
   int x, y;
-  int ch;
+  int c = 0,ch = 0;
   char **buffer;
   char **part;
   struct textline texts[NUM_TEXTLINES] = {
@@ -57,7 +57,12 @@ int main() {
     },
   };
 
-  void (*animator_func)(int *, int*, int, int) = top_down_animation;
+  short (*animator_func)(int *, int*, int, int) = top_down_animation;
+
+  struct timespec last_frame_time;
+  struct timespec current_time;
+
+  clock_gettime(CLOCK_REALTIME, &last_frame_time);
 
   srand(time(NULL));
 
@@ -85,15 +90,33 @@ int main() {
   // randomly draw bytes in buffer to correct position
   x = -1; y = -1;
   while(1) {
-    ch = getch();
-    animator_func(&y, &x, size_y, size_x);
+    c = getch();
+    if(c != ERR) {
+      ch = c;
+    }
 
-    char c = buffer[y][x];
-    c = c == 0 ? ' ' : c;
-    mvprintw(y, x, "%c", c);
+    // update current time
+    clock_gettime(CLOCK_REALTIME, &current_time);
 
-    if(ch == 'a') {
-      break;
+    // calculate diffrence
+    unsigned long long timediff = (((unsigned long long)current_time.tv_sec) << sizeof(time_t)) + current_time.tv_nsec;
+    timediff -= (((unsigned long long)last_frame_time.tv_sec) << sizeof(time_t)) + last_frame_time.tv_nsec;
+    
+     // check if diffrence is more or = 100ms
+    if(timediff >= 1000000) {
+      // store time of last frame
+      last_frame_time.tv_sec = current_time.tv_sec;
+      last_frame_time.tv_nsec = current_time.tv_nsec;
+
+      animator_func(&y, &x, size_y, size_x);
+
+      char c = buffer[y][x];
+      c = c == 0 ? ' ' : c;
+      mvprintw(y, x, "%c", c);
+
+      if(ch == 'a') {
+        break;
+      }
     }
   }
 
