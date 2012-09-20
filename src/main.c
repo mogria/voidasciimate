@@ -4,6 +4,8 @@
 #include "figlet/figlet.h"
 #include "animation/random.h"
 #include "animation/top-down.h"
+#include "animation/circle.h"
+#include "animation/lines.h"
 #include "macros/array.h"
 
 struct textline {
@@ -57,7 +59,7 @@ int main() {
     },
   };
 
-  short (*animator_func)(int *, int*, int, int) = top_down_animation;
+  short (*animator_func)(int *, int*, int, int) = random_animation;
 
   struct timespec last_frame_time;
   struct timespec current_time;
@@ -103,16 +105,20 @@ int main() {
     timediff -= (((unsigned long long)last_frame_time.tv_sec) << sizeof(time_t)) + last_frame_time.tv_nsec;
     
      // check if diffrence is more or = 100ms
-    if(timediff >= 1000000) {
+    if(timediff >= 10000000) {
       // store time of last frame
       last_frame_time.tv_sec = current_time.tv_sec;
       last_frame_time.tv_nsec = current_time.tv_nsec;
 
-      animator_func(&y, &x, size_y, size_x);
-
-      char c = buffer[y][x];
-      c = c == 0 ? ' ' : c;
-      mvprintw(y, x, "%c", c);
+      short again;
+      do {
+        again = animator_func(&y, &x, size_y, size_x);
+        if(y >= 0 && y < size_y && x >= 0 && x < size_x) {
+          char c = buffer[y][x];
+          c = c == 0 ? ' ' : c;
+          mvprintw(y, x, "%c", c);
+        }
+      } while (again);
 
       if(ch == 'a') {
         break;

@@ -1,9 +1,10 @@
 #include "top-down.h"
 
-void top_down_animation(int *pos_y, int *pos_x, int size_y, int size_x) {
+short top_down_animation(int *pos_y, int *pos_x, int size_y, int size_x) {
   if(*pos_y < 0 || *pos_x < 0) {
     *pos_y = 0; 
     *pos_x = 0; 
+    return 1;
   } else {
     (*pos_x)++;
     if(*pos_x >= size_x) {
@@ -13,6 +14,9 @@ void top_down_animation(int *pos_y, int *pos_x, int size_y, int size_x) {
       } else {
         (*pos_x) = size_x;
       }
+      return 0;
+    } else {
+      return 1;
     }
   }
 }
